@@ -61,7 +61,6 @@ async function handleLogin(req, res) {
 
 async function handleCheckAuth(req,res){
     const user = req.user
-    console("request came")
     if(user){
         res.json({msg:"authorized"})
     }else{

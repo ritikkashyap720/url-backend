@@ -7,12 +7,13 @@ function Login() {
   const [warning, setWarning] = useState()
   const navigate = useNavigate()
   const token = localStorage.getItem("token")
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
   useEffect(() => {
     console.log(token)
     if (token) {
       async function checkAuth(token) {
-        const response = await axios.get("http://localhost:8000/user/checkauth", {
+        const response = await axios.get(`${BACKEND_URL}/user/checkauth`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -32,7 +33,7 @@ function Login() {
     const name = formRef.current.name.value
     const email = formRef.current.email.value
     const password = formRef.current.password.value
-    const response = await axios.post("http://localhost:8000/user/login", { name, email, password })
+    const response = await axios.post(`${BACKEND_URL}/user/login`, { name, email, password })
     if (response) {
       if (response.data.token) {
         localStorage.setItem("token", response.data.token)

@@ -7,6 +7,8 @@ function Admin() {
   const [allurl, setAllUrl] = useState(null)
   const [newUrl, setNewUrl] = useState("")
   const [token, setToken] = useState(localStorage.getItem("token") || "")
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+  
   useEffect(() => {
     if (token) {
       LoadAllUrl(token)
@@ -18,7 +20,7 @@ function Admin() {
   async function handleAdd() {
     if (newUrl) {
       console.log(token)
-      const response = await axios.post("http://localhost:8000/url/newurl", { mainUrl: newUrl },
+      const response = await axios.post(`${BACKEND_URL}/url/newurl`, { mainUrl: newUrl },
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -26,13 +28,14 @@ function Admin() {
         })
       if (response.data.msg == "success") {
         LoadAllUrl(token)
+        setNewUrl("")
       }
     }
   }
 
   async function LoadAllUrl(token) {
     if (token) {
-      const response = await axios.get("http://localhost:8000/url/allurl", {
+      const response = await axios.get("http://localhost:8000/url/allUserUrl", {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -48,25 +51,35 @@ function Admin() {
   }
 
   async function deleteURL(urlID) {
-    console.log(token)
-    const response = await axios.delete("http://localhost:8000/url/deleteUrl",
+    const response = await axios.delete(`http://localhost:8000/url/deleteUrl/${urlID}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
         },
-      },
-      { urlID: urlID },)
+      })
     if (response.data.msg == "success") {
       LoadAllUrl(token)
     }
     console.log(response)
   }
 
+  async function viewUrl(shortID) {
+    window.open(shortID, "_blank")
+    setTimeout(() => {
+      LoadAllUrl(token)
+    }, 1000);
+  }
 
-
+  function logout(){
+    localStorage.clear()
+    navigate("/login")
+  }
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Admin Panel – URL Shortener</h1>
+      <div className='flex item-center w-full justify-between my-5'>
+        <h1 className="text-2xl font-bold mb-4">Admin Panel – URL Shortener</h1>
+        <button className='bg-red-600 py-2 px-2.5 rounded-sm text-white' onClick={()=>logout()}>Logout</button>
+      </div>
       <div className="flex gap-2 mb-6">
         <input
           placeholder="Original URL"
@@ -94,12 +107,19 @@ function Admin() {
         <tbody>
           {allurl.map(url => (
             <tr key={url._id} className="border-t">
-              <td className="p-2">{url.shortID}</td>
+              <td className="p-2">
+                <button
+                  onClick={() => { viewUrl(url.shortID) }}
+                  className="text-blue-600 hover:underline"
+                >
+                  {url.shortID}
+                </button>
+              </td>
               <td className="p-2 break-all">{url.mainUrl}</td>
               <td className="p-2">{url.clicks}</td>
               <td className="p-2">
                 <button
-                  onClick={(url) => { deleteURL(url._id) }}
+                  onClick={() => { deleteURL(url._id) }}
                   className="text-red-600 hover:underline"
                 >
                   Delete

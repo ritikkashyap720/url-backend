@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import GetUrl from './pages/GetUrl'
 
 function App() {
   const router = createBrowserRouter([
@@ -22,6 +23,9 @@ function App() {
     {
       path: "/signup",
       element: <Signup />
+    },{
+      path:"/:shortID",
+      element:<GetUrl/>
     }
   ])
 
